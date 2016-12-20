@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	<style>
+	* {
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+}
+*:focus {
+    outline: 0 !important;
+}
+
+body {
+    background-color: #fff;
+}
+html {
+    height: 100%;
+    width: 100%;
+}
+
+
+.btn.focus, .btn:focus, .btn:hover {
+    color: rgb(255, 255, 255);
+}
+
+.cutout {
+    background-color: #fff;
+    border-radius: 50%;
+    height: 45%;
+    left: 27.5%;
+    position: absolute;
+    top: 27.5%;
+    width: 45%;
+}
+.donut-ring {
+    border-radius: 100%;
+    position: relative;
+    height: 500px;
+    margin: 2% auto;
+    width: 500px;
+}
+.gameContainer {
+    text-align: center;
+    color: #eee !important;
+}
+.gameControls button {
+    border-radius: 5px;
+    border-style: solid;
+    border-width: 4px;
+    margin:5% .5%;
+    padding: 12px 0px;
+    width: 125px;
+}
+#play {
+  box-shadow: 0px 3px 3px rgba(0,0,0,0.19) !important;
+
+}
+
+.play {
+    border: 15px solid #26a65b;
+    background-color: #26a65b;
+}
+
+.reset {
+    box-shadow: 0px 3px 3px rgba(0,0,0,0.19);
+    border-color: #f22613;
+    background-color: #f22613;
+}
+.ring {
+    box-shadow: 0px 3px 3px rgba(0,0,0,0.25), 0 3px 3px rgba(0,0,0,0.22);
+    height: 48%;
+    opacity: 1;
+    position: absolute;
+    width: 48%;
+}
+.ring:active {
+    box-shadow: 0px 0px 2px rgba(0,0,0,0.25)
+}
+.ring.blue {
+    background-color: #446cb3;
+    border-radius: 0 100% 0 0;
+    right: 0;
+    top: 0;
+}
+.ring.green {
+    background-color: #26a65b;
+    border-radius: 0 0 100% 0;
+    bottom: 0;
+    right: 0;
+}
+.ring.red {
+    background-color: #f22613;
+    border-radius: 100% 0 0 0;
+    left: 0;
+    top: 0;
+}
+.ring.yellow {
+    background-color: #f7ca18;
+    border-radius: 0 0 0 100%;
+    bottom: 0;
+    left: 0;
+}
+
+.score {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  font-family: "Open Sans";
+  font-size: 2em;
+  color: #555;
+}
+
+.highScore {
+  position: absolute;
+  bottom: 0;
+  font-family: "Open Sans";
+  font-size: 2em;
+  color: #555;
+}
+.active {
+  opacity: 0.8;
+  transform: scale(0.99, 0.99);
+}
+
+@media only screen and (max-width : 525px) {
+  .donut-ring {
+  height: 300px;
+  width: 300px;
+    }
+  .gameControls {
+    margin: 20% 0;
+  }
+  .gameControls .btn {
+    width: 100px;
+    margin: 0% 1.25%;
+    border-radius: 5px;
+    padding: 15px 0;
+  }
+}
+	</style>
+</head>
+<body>
+<span class="highScore">High Score: 0</span>
+<span class="score">Score: 0</span>
+<div class="gameContainer col-lg-12">
+  <div class="donut-ring">
+    <div id = '1' class="ring red"></div>
+    <div id = '2' class="ring blue"></div>
+    <div id = '3' class="ring yellow"></div>
+    <div id = '4' class="ring green"></div>
+    <div class="cutout"></div>
+  </div>
+  <div class="gameControls">
+    <button id="play" class="play btn glyphicon glyphicon-play"></button>
+    <button class="reset btn glyphicon glyphicon-stop"></button>
+  </div>
+</div>
+
+<audio src="https://s3.amazonaws.com/freecodecamp/simonSound1.mp3" id="1sound"></audio>
+<audio src="https://s3.amazonaws.com/freecodecamp/simonSound2.mp3" id="2sound"></audio>
+<audio src="https://s3.amazonaws.com/freecodecamp/simonSound3.mp3" id="3sound"></audio>
+<audio src="https://s3.amazonaws.com/freecodecamp/simonSound4.mp3" id="4sound"></audio>
+<audio src="http://www.freesound.org/data/previews/331/331912_3248244-lq.mp3" id="5sound"></audio>
+<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans" />
+<script
+  src="https://code.jquery.com/jquery-3.1.1.min.js"
+  integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+  crossorigin="anonymous"></script>
+<script>
+$(document).ready(function(){
+    var randomNumberArray = [];
+    var userArray = [];
+    var start = false;
+    var score = 0;
+    var highScore = 0
+  
+    $('.reset').on('click', function() {
+        resetGame();
+    });
+
+    $('.play').on('click', function(){
+        playGame();
+    });
+  
+    $('.ring').mousedown(function(){
+        var id = this.id;
+        lightUp(id);
+    });
+
+    $('.ring').on('click', function() {
+        var id = this.id;
+        checkInput(id);
+    });
+
+    function playGame() {
+        if (start == false) {
+            start = true;
+            $('.play').css('box-shadow', '0 0 0 0');
+			$('.play').css('background-color', '#15954a');
+          $('.play').css('border-left-color', '#048439');          
+		  $('.play').css('border-top-color', '#15954a');
+
+            generateNextNumber();
+        }
+    }
+
+    function generateNumber(){
+        return Math.floor(Math.random() * 4 + 1);
+    }
+
+    function checkInput(id) {
+        if (start == true) {
+            if(userArray.length < randomNumberArray.length) {
+                userArray.push(id);
+                if (checkEachIndex()) {
+                    playSound(id);
+                }
+            }
+        }
+            if(userArray.length == randomNumberArray.length && randomNumberArray.length > 0) {
+                start = false;
+                generateNextNumber();
+                checkScore();
+                userArray = [];
+            }
+    }
+    
+    function checkEachIndex() {
+        var index = userArray.length -1;
+        if (userArray[index] == randomNumberArray[index]) {
+            return true;
+        } else {
+            playSound(5);
+            resetGame();
+            return false;
+        }
+    }
+
+    function generateNextNumber() {
+        var i = 0;
+        randomNumberArray.push(generateNumber());
+        console.log(randomNumberArray);
+        var interval = setInterval(function() {
+            if(randomNumberArray[i]){
+                playSound(randomNumberArray[i]);
+                lightUp(randomNumberArray[i]);
+                i++
+                if(i >= randomNumberArray.length) {
+                    start = true;
+                    clearInterval(interval);
+                }
+            }
+        }, 600);
+    }
+    
+    function playSound(id) {
+        var sound = document.getElementById(id + 'sound');
+        if(id == 5) {
+            sound.volume = 0.05;
+        }
+        sound.play()
+    }
+    
+    function lightUp(id) {
+        var tile = $('#' + id).addClass('active');
+        window.setTimeout(function() {
+            tile.removeClass('active')
+        }, 100);
+    }
+
+    function resetGame() {
+        userArray = [];
+        randomNumberArray = [];
+        score = 0;
+        $('.score').text('Score: ' + score);
+        $('.play').css('border-color', '#26a65b');
+        $('.play').css('background-color', '#26a65b');
+      $('.play').css('box-shadow', '0 6px 6px rgba(0,0,0,0.23)');
+
+        start = false;
+    }
+  
+    function checkScore() {
+      score++;
+      $('.score').text('Score: ' + score)
+      if (score > highScore) {
+        highScore = score;
+        $('.highScore').text('High Score: ' + highScore)
+        
+      }
+    }
+});
+</script>
+</body>
+</html>
